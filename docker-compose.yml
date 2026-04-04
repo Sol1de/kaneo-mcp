@@ -1,0 +1,10 @@
+services:
+  kaneo-mcp:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - KANEO_URL=http://kaneo:3000  # adjust to your Kaneo instance URL
+      - KANEO_WORKSPACE_ID=your-workspace-id
+      - MCP_PORT=3000
+    restart: unless-stopped
