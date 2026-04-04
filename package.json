@@ -1,0 +1,37 @@
+{
+  "name": "kaneo-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Kaneo — self-hosted Kanban project management",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "kaneo-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": [
+    "mcp",
+    "kaneo",
+    "kanban",
+    "project-management"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}
