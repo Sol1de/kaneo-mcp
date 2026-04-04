@@ -1,21 +1,26 @@
+export interface KaneoClientOptions {
+  baseUrl: string;
+  token: string;
+  workspaceId: string;
+}
+
 export class KaneoClient {
   private baseUrl: string;
   private token: string;
   readonly workspaceId: string;
 
-  constructor() {
-    const url = process.env.KANEO_URL;
-    const token = process.env.KANEO_TOKEN;
-    const workspaceId = process.env.KANEO_WORKSPACE_ID;
+  private constructor(opts: KaneoClientOptions) {
+    this.baseUrl = opts.baseUrl.replace(/\/+$/, "") + "/api";
+    this.token = opts.token;
+    this.workspaceId = opts.workspaceId;
+  }
 
-    if (!url) throw new Error("KANEO_URL environment variable is required");
-    if (!token) throw new Error("KANEO_TOKEN environment variable is required");
-    if (!workspaceId)
-      throw new Error("KANEO_WORKSPACE_ID environment variable is required");
-
-    this.baseUrl = url.replace(/\/+$/, "") + "/api";
-    this.token = token;
-    this.workspaceId = workspaceId;
+  /**
+   * Create a client from explicit options (used by HTTP transport,
+   * where each request carries its own Kaneo token).
+   */
+  static create(opts: KaneoClientOptions): KaneoClient {
+    return new KaneoClient(opts);
   }
 
   private async request<T>(

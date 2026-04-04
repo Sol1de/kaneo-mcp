@@ -1,7 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod/v4";
-import type { KaneoClient } from "../client.js";
-import type { Column } from "../types.js";
+import type { KaneoClient } from "../clients/client.js";
+import type { Column } from "../types/index.js";
+import { jsonResponse } from "./helpers.js";
 
 export function registerColumnTools(server: McpServer, client: KaneoClient) {
   server.registerTool(
@@ -18,9 +19,7 @@ export function registerColumnTools(server: McpServer, client: KaneoClient) {
       const columns = await client.get<Column[]>(
         `/column/${encodeURIComponent(projectId)}`,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(columns, null, 2) }],
-      };
+      return jsonResponse(columns);
     },
   );
 
@@ -37,9 +36,7 @@ export function registerColumnTools(server: McpServer, client: KaneoClient) {
     },
     async (body) => {
       const column = await client.post<Column>("/column", body);
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(column, null, 2) }],
-      };
+      return jsonResponse(column);
     },
   );
 }

@@ -1,7 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod/v4";
-import type { KaneoClient } from "../client.js";
-import type { Label } from "../types.js";
+import type { KaneoClient } from "../clients/client.js";
+import type { Label } from "../types/index.js";
+import { jsonResponse } from "./helpers.js";
 
 export function registerLabelTools(server: McpServer, client: KaneoClient) {
   server.registerTool(
@@ -21,9 +22,7 @@ export function registerLabelTools(server: McpServer, client: KaneoClient) {
       const labels = await client.get<Label[]>(
         `/label/workspace/${encodeURIComponent(wsId)}`,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(labels, null, 2) }],
-      };
+      return jsonResponse(labels);
     },
   );
 
@@ -40,9 +39,7 @@ export function registerLabelTools(server: McpServer, client: KaneoClient) {
       const labels = await client.get<Label[]>(
         `/label/task/${encodeURIComponent(taskId)}`,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(labels, null, 2) }],
-      };
+      return jsonResponse(labels);
     },
   );
 
@@ -58,9 +55,7 @@ export function registerLabelTools(server: McpServer, client: KaneoClient) {
     },
     async (body) => {
       const result = await client.post<unknown>("/label/attach", body);
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-      };
+      return jsonResponse(result);
     },
   );
 
@@ -78,9 +73,7 @@ export function registerLabelTools(server: McpServer, client: KaneoClient) {
       const result = await client.del<unknown>(
         `/label/detach?taskId=${encodeURIComponent(taskId)}&labelId=${encodeURIComponent(labelId)}`,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-      };
+      return jsonResponse(result);
     },
   );
 }

@@ -1,7 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod/v4";
-import type { KaneoClient } from "../client.js";
-import type { WorkspaceMember } from "../types.js";
+import type { KaneoClient } from "../clients/client.js";
+import type { WorkspaceMember } from "../types/index.js";
+import { jsonResponse } from "./helpers.js";
 
 export function registerWorkspaceTools(server: McpServer, client: KaneoClient) {
   server.registerTool(
@@ -21,9 +22,7 @@ export function registerWorkspaceTools(server: McpServer, client: KaneoClient) {
       const members = await client.get<WorkspaceMember[]>(
         `/workspace/${encodeURIComponent(wsId)}/members`,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(members, null, 2) }],
-      };
+      return jsonResponse(members);
     },
   );
 }

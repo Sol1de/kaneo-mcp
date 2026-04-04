@@ -1,7 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod/v4";
-import type { KaneoClient } from "../client.js";
-import type { SearchResult } from "../types.js";
+import type { KaneoClient } from "../clients/client.js";
+import type { SearchResult } from "../types/index.js";
+import { jsonResponse } from "./helpers.js";
 
 export function registerSearchTools(server: McpServer, client: KaneoClient) {
   server.registerTool(
@@ -37,9 +38,7 @@ export function registerSearchTools(server: McpServer, client: KaneoClient) {
       if (projectId) params.set("projectId", projectId);
       if (limit) params.set("limit", String(limit));
       const result = await client.get<SearchResult>(`/search?${params}`);
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-      };
+      return jsonResponse(result);
     },
   );
 }

@@ -1,7 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod/v4";
-import type { KaneoClient } from "../client.js";
-import type { Activity } from "../types.js";
+import type { KaneoClient } from "../clients/client.js";
+import type { Activity } from "../types/index.js";
+import { jsonResponse } from "./helpers.js";
 
 export function registerCommentTools(server: McpServer, client: KaneoClient) {
   server.registerTool(
@@ -18,11 +19,7 @@ export function registerCommentTools(server: McpServer, client: KaneoClient) {
       const activities = await client.get<Activity[]>(
         `/activity/${encodeURIComponent(taskId)}`,
       );
-      return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(activities, null, 2) },
-        ],
-      };
+      return jsonResponse(activities);
     },
   );
 
@@ -38,11 +35,7 @@ export function registerCommentTools(server: McpServer, client: KaneoClient) {
     },
     async (body) => {
       const activity = await client.post<Activity>("/activity/comment", body);
-      return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(activity, null, 2) },
-        ],
-      };
+      return jsonResponse(activity);
     },
   );
 }

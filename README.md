@@ -11,6 +11,7 @@ MCP (Model Context Protocol) server for [Kaneo](https://kaneo.app) — a self-ho
 - **Labels** — List, attach, and detach labels
 - **Search** — Global search across tasks, projects, and more
 - **Workspace** — List workspace members
+- **HTTP remote server** — deploy alongside Kaneo on your VPS
 
 ## Setup
 
@@ -24,82 +25,53 @@ MCP (Model Context Protocol) server for [Kaneo](https://kaneo.app) — a self-ho
 
 List your workspaces via the API or find it in the Kaneo URL.
 
-### 3. Configure
+---
 
-Set these environment variables:
+## Deployment
 
-```
-KANEO_URL=https://your-kaneo-instance.com
-KANEO_TOKEN=your-api-key
-KANEO_WORKSPACE_ID=your-workspace-id
-```
+Deploy on your server alongside Kaneo. Team members just configure a URL — no Node.js or installation needed.
 
-## Installation
-
-### npm (recommended)
-
-```bash
-npm install -g kaneo-mcp
-```
-
-### From source
+### Deploy with Docker
 
 ```bash
 git clone https://github.com/your-username/kaneo-mcp.git
 cd kaneo-mcp
-npm install
-npm run build
 ```
 
-## Usage
-
-### Claude Code
+Edit `docker-compose.yml` with your settings, then:
 
 ```bash
-claude mcp add kaneo -- \
-  env KANEO_URL=https://your-instance.com \
-  KANEO_TOKEN=your-token \
-  KANEO_WORKSPACE_ID=your-workspace-id \
-  npx kaneo-mcp
+docker compose up -d
 ```
 
-### Claude Desktop
+#### Environment variables (server-side)
 
-Add to `claude_desktop_config.json`:
+| Variable | Required | Description |
+|---|---|---|
+| `KANEO_URL` | Yes | URL of your Kaneo instance |
+| `KANEO_WORKSPACE_ID` | Yes | Default workspace ID |
+| `MCP_PORT` | No | HTTP port (default: 3000) |
+
+### User configuration — Claude Desktop
+
+Each team member adds this to their `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "kaneo": {
-      "command": "npx",
-      "args": ["kaneo-mcp"],
-      "env": {
-        "KANEO_URL": "https://your-instance.com",
-        "KANEO_TOKEN": "your-token",
-        "KANEO_WORKSPACE_ID": "your-workspace-id"
+      "url": "https://mcp.your-domain.com/mcp",
+      "headers": {
+        "Authorization": "Bearer your-personal-kaneo-api-key"
       }
     }
   }
 }
 ```
 
-### From source (Claude Desktop)
+Each user provides their own Kaneo API key as a Bearer token. Create one in **Kaneo → Settings → Account → Developer Settings**.
 
-```json
-{
-  "mcpServers": {
-    "kaneo": {
-      "command": "node",
-      "args": ["/path/to/kaneo-mcp/dist/index.js"],
-      "env": {
-        "KANEO_URL": "https://your-instance.com",
-        "KANEO_TOKEN": "your-token",
-        "KANEO_WORKSPACE_ID": "your-workspace-id"
-      }
-    }
-  }
-}
-```
+---
 
 ## Available Tools
 
@@ -127,6 +99,17 @@ Add to `claude_desktop_config.json`:
 | `detach-label` | Remove a label from a task |
 | `search` | Search across all Kaneo data |
 | `list-workspace-members` | List workspace members |
+
+## Building binaries
+
+To build a standalone binary (no Node.js required to run):
+
+```bash
+npm run build
+npm run build:binary
+```
+
+The binary will be in `build/kaneo-mcp-<os>-<arch>`.
 
 ## License
 

@@ -1,0 +1,17 @@
+services:
+  kaneo-mcp:
+    build: .
+    container_name: kaneo-mcp
+    ports:
+      - "${MCP_PORT:-3200}:${MCP_PORT:-3200}"
+    environment:
+      - KANEO_URL=${KANEO_URL}
+      - KANEO_WORKSPACE_ID=${KANEO_WORKSPACE_ID}
+      - MCP_PORT=${MCP_PORT:-3200}
+    restart: unless-stopped
+    networks:
+      - kaneo_default
+
+networks:
+  kaneo_default:
+    external: true

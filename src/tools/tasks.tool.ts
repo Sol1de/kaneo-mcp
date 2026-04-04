@@ -1,7 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod/v4";
-import type { KaneoClient } from "../client.js";
-import type { Task } from "../types.js";
+import type { KaneoClient } from "../clients/client.js";
+import type { Task } from "../types/index.js";
+import { jsonResponse } from "./helpers.js";
 
 export function registerTaskTools(server: McpServer, client: KaneoClient) {
   server.registerTool(
@@ -43,9 +44,7 @@ export function registerTaskTools(server: McpServer, client: KaneoClient) {
       const qs = params.toString();
       const path = `/task/tasks/${encodeURIComponent(projectId)}${qs ? `?${qs}` : ""}`;
       const result = await client.get<unknown>(path);
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-      };
+      return jsonResponse(result);
     },
   );
 
@@ -60,9 +59,7 @@ export function registerTaskTools(server: McpServer, client: KaneoClient) {
     },
     async ({ id }) => {
       const task = await client.get<Task>(`/task/${encodeURIComponent(id)}`);
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(task, null, 2) }],
-      };
+      return jsonResponse(task);
     },
   );
 
@@ -88,9 +85,7 @@ export function registerTaskTools(server: McpServer, client: KaneoClient) {
         `/task/${encodeURIComponent(projectId)}`,
         body,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(task, null, 2) }],
-      };
+      return jsonResponse(task);
     },
   );
 
@@ -98,29 +93,32 @@ export function registerTaskTools(server: McpServer, client: KaneoClient) {
     "update-task",
     {
       title: "Update Task",
-      description: "Update all fields of an existing task.",
+      description:
+        "Update an existing task. Only provide the fields you want to change.",
       inputSchema: z.object({
         id: z.string().describe("Task ID"),
-        title: z.string().describe("Task title"),
-        description: z.string().describe("Task description"),
+        title: z.string().optional().describe("Task title"),
+        description: z.string().optional().describe("Task description"),
         priority: z
           .enum(["no-priority", "low", "medium", "high", "urgent"])
+          .optional()
           .describe("Task priority"),
-        status: z.string().describe("Task status"),
-        projectId: z.string().describe("Project ID the task belongs to"),
-        position: z.number().describe("Task position/order in the column"),
+        status: z.string().optional().describe("Task status"),
+        projectId: z.string().optional().describe("Project ID the task belongs to"),
+        position: z.number().optional().describe("Task position/order in the column"),
         dueDate: z.string().optional().describe("Due date (ISO 8601)"),
         userId: z.string().optional().describe("Assigned user ID"),
       }),
     },
     async ({ id, ...body }) => {
+      const filtered = Object.fromEntries(
+        Object.entries(body).filter(([, v]) => v !== undefined),
+      );
       const task = await client.put<Task>(
         `/task/${encodeURIComponent(id)}`,
-        body,
+        filtered,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(task, null, 2) }],
-      };
+      return jsonResponse(task);
     },
   );
 
@@ -142,9 +140,7 @@ export function registerTaskTools(server: McpServer, client: KaneoClient) {
         `/task/status/${encodeURIComponent(id)}`,
         { status },
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(task, null, 2) }],
-      };
+      return jsonResponse(task);
     },
   );
 
@@ -159,11 +155,7 @@ export function registerTaskTools(server: McpServer, client: KaneoClient) {
     },
     async ({ id }) => {
       const result = await client.del<Task>(`/task/${encodeURIComponent(id)}`);
-      return {
-        content: [
-          { type: "text" as const, text: `Task deleted: ${JSON.stringify(result, null, 2)}` },
-        ],
-      };
+      return jsonResponse(result);
     },
   );
 
@@ -181,9 +173,7 @@ export function registerTaskTools(server: McpServer, client: KaneoClient) {
       const result = await client.get<unknown>(
         `/task/export/${encodeURIComponent(projectId)}`,
       );
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-      };
+      return jsonResponse(result);
     },
   );
 }
