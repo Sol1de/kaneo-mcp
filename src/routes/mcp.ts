@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { RESPONSE_ALREADY_SENT } from "@hono/node-server/utils/response";
 import type { AppEnv } from "../types/index.js";
 import { mcpService } from "../container.js";
@@ -15,7 +16,7 @@ mcp.post("/", async (c) => {
   );
 
   if (result.kind === "handled") return RESPONSE_ALREADY_SENT;
-  return c.json(result.body, result.status as 400);
+  return c.json(result.body, result.status as ContentfulStatusCode);
 });
 
 mcp.on(["GET", "DELETE"], "/", async (c) => {
@@ -26,7 +27,7 @@ mcp.on(["GET", "DELETE"], "/", async (c) => {
   );
 
   if (result.kind === "handled") return RESPONSE_ALREADY_SENT;
-  return c.json(result.body, result.status as 400);
+  return c.json(result.body, result.status as ContentfulStatusCode);
 });
 
 export default mcp;

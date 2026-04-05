@@ -11,7 +11,10 @@ export const authMiddleware = createMiddleware<{
     ? auth.slice(7)
     : tokenFromQuery;
 
+  console.error(`[AUTH] ${c.req.method} ${c.req.path} hasAuthHeader=${!!auth} hasQueryToken=${!!tokenFromQuery} tokenResolved=${!!token}`);
+
   if (!token) {
+    console.error(`[AUTH] Rejected: no token found`);
     return c.json(
       { error: "Missing or invalid Authorization: Bearer <token> or ?token= query parameter" },
       401,

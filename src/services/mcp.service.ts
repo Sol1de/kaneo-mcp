@@ -13,25 +13,35 @@ export class McpService {
     incoming: IncomingMessage,
     outgoing: ServerResponse,
   ): Promise<McpResult> {
+    const method = (body as { method?: string })?.method ?? "unknown";
+    console.error(`[MCP] POST method=${method} sessionId=${sessionId ?? "none"} hasToken=${!!kaneoToken}`);
+
     if (sessionId && this.sessions.has(sessionId)) {
       const session = this.sessions.get(sessionId)!;
-      await session.transport.handleRequest(incoming, outgoing, body);
+      try {
+        await session.transport.handleRequest(incoming, outgoing, body);
+      } catch (err) {
+        console.error(`[MCP] Error in session handler:`, err);
+        throw err;
+      }
       return { kind: "handled" };
     }
 
-    if (!sessionId && isInitializeRequest(body)) {
+    if (isInitializeRequest(body)) {
+      console.error(`[MCP] Creating new session (stale sessionId=${sessionId ?? "none"})`);
       const { server, transport } = this.sessions.create(kaneoToken);
       await server.connect(transport);
       await transport.handleRequest(incoming, outgoing, body);
       return { kind: "handled" };
     }
 
+    console.error(`[MCP] Rejected: sessionId=${sessionId} known=${sessionId ? this.sessions.has(sessionId) : "N/A"} isInit=false`);
     return {
       kind: "error",
-      status: 400,
+      status: 404,
       body: {
         jsonrpc: "2.0",
-        error: { code: -32000, message: "Invalid session or request" },
+        error: { code: -32000, message: "Session not found. Please re-initialize." },
         id: null,
       },
     };
