@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod/v4";
 import type { KaneoClient } from "../clients/client.js";
 import type { Task } from "../types/index.js";
-import { jsonResponse } from "./helpers.js";
+import { jsonResponse } from "./index.js";
 
 export function registerTaskTools(server: McpServer, client: KaneoClient) {
   server.registerTool(

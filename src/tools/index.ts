@@ -8,6 +8,12 @@ import { registerLabelTools } from "./labels.tool.js";
 import { registerSearchTools } from "./search.tool.js";
 import { registerWorkspaceTools } from "./workspace.tool.js";
 
+export function jsonResponse(data: unknown) {
+  return {
+    content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
+  };
+}
+
 export function registerAllTools(server: McpServer, client: KaneoClient) {
   registerProjectTools(server, client);
   registerTaskTools(server, client);
