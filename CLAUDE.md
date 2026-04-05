@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run build          # TypeScript → dist/
 npm run start          # Run HTTP server (requires KANEO_URL, KANEO_WORKSPACE_ID)
-npm run dev            # Dev mode (tsx)
+npm run dev            # Dev mode (tsx, loads .env automatically)
 npm run build:bundle   # esbuild → single CJS file in build/kaneo-mcp.cjs
 npm run build:binary   # Node SEA binary in build/kaneo-mcp-{os}-{arch}
 ```
@@ -21,24 +21,26 @@ sleep 1 && kill $!
 
 ## Architecture
 
-MCP server exposing 22 tools for the Kaneo Kanban API. HTTP Streamable transport only.
+MCP server exposing 22 tools for the Kaneo Kanban API. HTTP Streamable transport via Hono.
 
-### Entry Point
+### Request Flow
 
-- **`src/server.ts`** — HTTP Streamable transport (remote, multi-user). Each request carries `Authorization: Bearer <kaneo-api-key>` header. Creates a `KaneoClient.create()` per session with the user's token. Manages sessions via a `Map<sessionId, {transport, server}>`.
+1. **`server.ts`** — Hono app, mounts auth middleware on `/mcp/*`, delegates to MCP routes
+2. **`middleware/auth.ts`** — extracts Kaneo API token from `Authorization: Bearer` header or `?token=` query param, sets it on context
+3. **`routes/mcp.ts`** — handles POST/GET/DELETE on `/mcp`, manages session lifecycle (initialize → reuse → cleanup) using raw Node `incoming`/`outgoing` via `@hono/node-server`
+4. **`session.ts`** — `SessionManager` class: creates `McpServer` + `KaneoClient` + `NodeStreamableHTTPServerTransport` per session, stores in `Map<sessionId, Session>`
+5. **`clients/client.ts`** — `KaneoClient` class: thin fetch wrapper, prepends `{KANEO_URL}/api`, adds Bearer token, typed `get/post/put/del` methods
+6. **`tools/*.ts`** — each exports `register*Tools(server, client)`, defines tools with Zod input schemas, calls KaneoClient methods
+7. **`types/*.ts`** — TypeScript interfaces matching Kaneo API responses
 
-### Layers
+### Environment (`env.ts`)
 
-1. **Transport** (`server.ts`) — HTTP server, wires up McpServer
-2. **Tools** (`tools/index.ts`) — barrel that calls all 7 `register*Tools()` functions
-3. **Tool modules** (`tools/*.ts`) — each exports `register*Tools(server, client)`, defines tools with Zod input schemas, calls KaneoClient methods, returns JSON text content
-4. **Client** (`client.ts`) — thin fetch wrapper: prepends `{KANEO_URL}/api`, adds Bearer token, typed `get/post/put/del` methods
-5. **Types** (`types/*.ts`) — TypeScript interfaces matching Kaneo API responses, one per file with barrel index
+Required: `KANEO_URL`, `KANEO_WORKSPACE_ID`. Optional: `MCP_PORT` (default 3000), OAuth vars (`ZITADEL_ISSUER`, `ZITADEL_AUDIENCE`, `MCP_SERVER_ORIGIN`), `KANEO_DEFAULT_API_KEY`, `KANEO_USER_TOKEN_MAP` (JSON object mapping user IDs to tokens).
 
 ### Adding a New Tool
 
-1. Create or edit a file in `src/tools/`
-2. Call `server.registerTool(name, { description, inputSchema: z.object({...}) }, handler)`
+1. Create or edit a file in `src/tools/` (naming: `*.tool.ts`)
+2. Export a `register*Tools(server, client)` function that calls `server.registerTool(name, { description, inputSchema: z.object({...}) }, handler)`
 3. If new file, import and call it in `src/tools/index.ts`
 
 ### Conventions

@@ -3,7 +3,7 @@
 ## Development Setup
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Sol1de/kaneo-mcp.git
 cd kaneo-mcp
 npm install
 cp .env.example .env   # fill in your Kaneo credentials
