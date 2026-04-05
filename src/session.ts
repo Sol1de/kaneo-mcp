@@ -33,6 +33,7 @@ export class SessionManager {
 
     const transport = new NodeStreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
+      enableJsonResponse: true,
       onsessioninitialized: (sessionId) => {
         this.sessions.set(sessionId, { transport, server });
       },
