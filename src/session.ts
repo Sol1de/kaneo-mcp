@@ -4,11 +4,7 @@ import { NodeStreamableHTTPServerTransport } from "@modelcontextprotocol/node";
 import { KaneoClient } from "./clients/client.js";
 import { registerAllTools } from "./tools/index.js";
 import type { Environment } from "./env.js";
-
-export interface Session {
-  transport: NodeStreamableHTTPServerTransport;
-  server: McpServer;
-}
+import type { Session } from "./types/index.js";
 
 export class SessionManager {
   private readonly sessions = new Map<string, Session>();

@@ -1,8 +1,5 @@
 import { createMiddleware } from "hono/factory";
-
-export type AuthVariables = {
-  kaneoToken: string;
-};
+import type { AuthVariables } from "../types/index.js";
 
 export const authMiddleware = createMiddleware<{
   Variables: AuthVariables;

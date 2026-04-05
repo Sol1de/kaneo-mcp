@@ -1,3 +1,8 @@
+export type { AppEnv } from "./env.type.js";
+export type { McpResult } from "./mcp.type.js";
+export type { AuthVariables } from "./auth.type.js";
+export type { Session } from "./session.type.js";
+export type { KaneoClientOptions } from "./client.type.js";
 export type { Project } from "./project.type.js";
 export type { Task } from "./task.type.js";
 export type { Column } from "./column.type.js";

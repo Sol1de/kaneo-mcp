@@ -1,8 +1,4 @@
-export interface KaneoClientOptions {
-  baseUrl: string;
-  token: string;
-  workspaceId: string;
-}
+import type { KaneoClientOptions } from "../types/index.js";
 
 export class KaneoClient {
   private baseUrl: string;
