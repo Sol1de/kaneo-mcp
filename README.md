@@ -34,7 +34,7 @@ Deploy on your server alongside Kaneo. Team members just configure a URL — no 
 ### Deploy with Docker
 
 ```bash
-git clone https://github.com/your-username/kaneo-mcp.git
+git clone https://github.com/Sol1de/kaneo-mcp.git
 cd kaneo-mcp
 ```
 
@@ -70,6 +70,14 @@ Each team member adds this to their `claude_desktop_config.json`:
 ```
 
 Each user provides their own Kaneo API key as a Bearer token. Create one in **Kaneo → Settings → Account → Developer Settings**.
+
+Alternatively, the token can be passed as a query parameter:
+
+```
+https://mcp.your-domain.com/mcp?token=your-personal-kaneo-api-key
+```
+
+> For full documentation, see the [docs/](docs/) folder.
 
 ---
 
