@@ -11,15 +11,15 @@ HTTP Request
 ┌──────────────────────────┐
 │  Transport (server.ts)   │  Hono HTTP server, routing
 ├──────────────────────────┤
-│  Auth (middleware/auth)   │  Extracts Bearer token
+│  Auth (middleware/auth)  │  Extracts Bearer token
 ├──────────────────────────┤
 │  Routes (routes/mcp.ts)  │  Session lookup, MCP protocol handling
 ├──────────────────────────┤
 │  Sessions (session.ts)   │  Creates McpServer + KaneoClient per user
 ├──────────────────────────┤
-│  Tools (tools/*.ts)      │  22 MCP tools with Zod schemas
+│  Tools (tools/*.ts)      │  Register MCP tools with Zod schemas
 ├──────────────────────────┤
-│  Client (clients/client) │  Thin fetch wrapper for Kaneo API
+│  Client (clients/client) │  Fetch wrapper for Kaneo API
 └──────────────────────────┘
     |
     v
@@ -97,7 +97,7 @@ TypeScript interfaces matching Kaneo API responses: `Project`, `Task`, `Column`,
 ```
 src/
 ├── server.ts              # Entry point, Hono app
-├── env.ts                 # Environment class (env var parsing)
+├── env.ts                 # Environment parsing & validator
 ├── session.ts             # SessionManager class
 ├── middleware/
 │   └── auth.ts            # Bearer token extraction
